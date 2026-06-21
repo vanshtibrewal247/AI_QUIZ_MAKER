@@ -1,0 +1,135 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+  ADAPTIVE
+}
+
+enum QuizMode {
+  TIMED
+  PRACTICE
+  TOPIC
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  name                String?
+  image               String?
+  createdAt           DateTime             @default(now())
+  accounts            Account[]
+  sessions            Session[]
+  quizAttempts        QuizAttempt[]
+  quizzes             Quiz[]
+  performanceInsights PerformanceInsight[]
+}
+
+model Quiz {
+  id           String         @id @default(cuid())
+  title        String
+  topic        String
+  difficulty   Difficulty
+  mode         QuizMode
+  createdAt    DateTime       @default(now())
+  quizQuestions Question[]     @relation("QuizQuestions")
+  quizAttempts  QuizAttempt[]
+  author       User?          @relation(fields: [authorId], references: [id])
+  authorId     String?
+}
+
+model Question {
+  id            String   @id @default(cuid())
+  quiz          Quiz     @relation("QuizQuestions", fields: [quizId], references: [id])
+  quizId        String
+  text          String
+  options       Json
+  correctAnswer Int
+  explanation   String?
+  difficulty    String
+  timeLimit     Int?
+  order         Int
+  userAnswers   UserAnswer[]
+}
+
+model QuizAttempt {
+  id             String       @id @default(cuid())
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String
+  quiz           Quiz         @relation(fields: [quizId], references: [id])
+  quizId         String
+  score          Float
+  totalQuestions Int
+  timeTaken      Int
+  completedAt    DateTime?
+  userAnswers    UserAnswer[]
+}
+
+model UserAnswer {
+  id             String      @id @default(cuid())
+  attempt        QuizAttempt @relation(fields: [attemptId], references: [id])
+  attemptId      String
+  question       Question    @relation(fields: [questionId], references: [id])
+  questionId     String
+  selectedAnswer Int
+  isCorrect      Boolean
+  timeSpent      Int
+}
+
+model PerformanceInsight {
+  id                String   @id @default(cuid())
+  user              User     @relation(fields: [userId], references: [id])
+  userId            String
+  topic             String
+  strengths         Json
+  weaknesses        Json
+  recommendedTopics Json
+  generatedAt       DateTime @default(now())
+}
+
+model Account {
+  id                 Int     @id @default(autoincrement())
+  user               User    @relation(fields: [userId], references: [id])
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  oauth_token_secret String?
+  oauth_token        String?
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  expires      DateTime
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
