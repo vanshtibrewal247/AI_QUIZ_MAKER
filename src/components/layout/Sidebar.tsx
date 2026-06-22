@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BarChart3, BookOpen, PlusCircle, Sparkles } from "lucide-react";
+import { BarChart3, BookOpen, PlusCircle, Sparkles, Clock } from "lucide-react";
 
 export function Sidebar() {
   return (
@@ -24,6 +24,10 @@ export function Sidebar() {
         <Link href="/quiz/placeholder" className="flex items-center gap-3 rounded-xl px-3 py-3 transition hover:bg-white hover:text-slate-900">
           <BookOpen className="h-4 w-4" />
           Take Quiz
+        </Link>
+        <Link href="/history" className="flex items-center gap-3 rounded-xl px-3 py-3 transition hover:bg-white hover:text-slate-900">
+          <Clock className="h-4 w-4" />
+          History
         </Link>
       </nav>
     </aside>
