@@ -27,43 +27,28 @@ const buildContent = (prompt: string): Content[] => [
   },
 ];
 
-const extractText = (result: GenerateContentResult | GenerateContentStreamResult): string => {
-  const candidate = result?.response?.candidates?.[0];
-  const parts = candidate?.content?.parts ?? [];
-  return parts
-    .filter((part: any) => typeof part === "object" && typeof part.text === "string")
-    .map((part: any) => part.text)
-    .join("");
-};
-
 export async function generateJSON(prompt: string, model?: string): Promise<GenerateContentResult> {
   const client = model === "flash" ? geminiFlash : geminiFlash;
-
-  try {
-    return await client.generateContent({
-      contents: buildContent(prompt),
-      generationConfig: {
-        responseMimeType: "text/plain",
-      },
-    });
-  } catch (error) {
-    console.error("gemini generateJSON error:", error);
-    throw error;
-  }
+ 
+  return client.generateContent({
+    contents: buildContent(prompt),
+    generationConfig: {
+      responseMimeType: "application/json",
+      temperature: 1.5,
+       topP: 0.95,
+        topK: 64,
+        maxOutputTokens: 4096,
+    },
+  });
 }
 
 export async function streamText(prompt: string, model?: string): Promise<GenerateContentStreamResult> {
   const client = model === "flash" ? geminiFlash : geminiFlash;
 
-  try {
-    return await client.generateContentStream({
-      contents: buildContent(prompt),
-      generationConfig: {
-        responseMimeType: "text/plain",
-      },
-    });
-  } catch (error) {
-    console.error("gemini streamText error:", error);
-    throw error;
-  }
+  return client.generateContentStream({
+    contents: buildContent(prompt),
+    generationConfig: {
+      responseMimeType: "text/plain",
+    },
+  });
 }

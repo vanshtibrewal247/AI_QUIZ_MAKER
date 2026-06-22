@@ -47,11 +47,36 @@ export async function POST(req: Request) {
     const payload = await req.json();
     const { topic, difficulty, count } = GenerateQuestionsSchema.parse(payload);
 
-    const prompt = `Generate ${count} quiz questions on the topic of \"${topic}\" at ${difficulty} difficulty. Reply only with valid JSON, using the following shape: { \"questions\": [ { \"text\": string, \"options\": string[], \"correctAnswer\": number, \"explanation\": string, \"difficulty\": string, \"timeLimit\": number, \"order\": number } ] }`;
+    const prompt =
+    `You are a quiz generator. Generate ${count} completely unique and varied quiz questions on the topic of "${topic}" at ${difficulty} difficulty level.
+
+Session ID: ${Math.random().toString(36).substring(2, 10)}-${Date.now()}
+
+Rules:
+- Never repeat obvious or common questions
+- Mix conceptual, applied, and tricky questions
+- Each question must be distinctly different from the others
+- Be creative with question phrasing
+
+Reply only with valid JSON using this exact shape:
+{
+  "questions": [
+    {
+      "text": string,
+      "options": string[],
+      "correctAnswer": number,
+      "explanation": string,
+      "difficulty": string,
+      "timeLimit": number,
+      "order": number
+    }
+  ]
+}`;
 
     const completion = await generateJSON(prompt, "flash");
     const text = extractText(completion);
     const parsed = parseJson<{ questions: any[] }>(text);
+    console.log(parsed?.questions)
 
     if (!parsed?.questions || !Array.isArray(parsed.questions)) {
       return NextResponse.json(
@@ -63,7 +88,7 @@ export async function POST(req: Request) {
         { status: 502 },
       );
     }
-
+    console.log("Generated questions:", parsed.questions);
     return NextResponse.json(
       {
         data: { questions: parsed.questions },
