@@ -1,28 +1,8 @@
-import { NextResponse } from "next/server";
-import { z } from "zod";
-import { Difficulty, QuizMode } from "@/types/quiz";
-import prisma from "@/lib/prisma";
-
-const CreateQuizSchema = z.object({
-  title: z.string().min(1),
-  topic: z.string().min(1),
-  difficulty: z.nativeEnum(Difficulty),
-  mode: z.nativeEnum(QuizMode),
-  authorId: z.string().optional(),
-  questions: z
-    .array(
-      z.object({
-        text: z.string().min(1),
-        options: z.array(z.string().min(1)).min(2),
-        correctAnswer: z.number().int().nonnegative(),
-        explanation: z.string().optional(),
-        difficulty: z.string().min(1),
-        timeLimit: z.number().int().positive().optional(),
-        order: z.number().int().positive().optional(),
-      }),
-    )
-    .min(1),
-});
+import { auth } from "@clerk/nextjs/server"
+import { NextResponse } from "next/server"
+import { prisma } from "../../../src/db"
+import { syncClerkUser } from "../../../src/lib/user-sync"
+import { Difficulty, QuizMode } from "@/types/quiz"
 
 export async function GET() {
   try {
@@ -57,54 +37,60 @@ export async function GET() {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const payload = await req.json();
-    const { title, topic, difficulty, mode, authorId, questions } = CreateQuizSchema.parse(payload);
+    const { userId } = await auth()
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+    const dbUser = await syncClerkUser()
+    if (!dbUser) return NextResponse.json({ error: "User sync failed" }, { status: 401 })
+
+    const body = await request.json()
+    const { title, topic, difficulty, mode, questions } = body
+
+    // Save quiz with nested questions in one Prisma call
     const quiz = await prisma.quiz.create({
       data: {
         title,
         topic,
-        difficulty,
-        mode,
-        authorId,
+        difficulty: difficulty as Difficulty,
+        mode: mode as QuizMode,
+        author: { connect: { id: dbUser.id } },
         quizQuestions: {
-          create: questions.map((question, index) => ({
-            text: question.text,
-            options: question.options,
-            correctAnswer: question.correctAnswer,
-            explanation: question.explanation,
-            difficulty: question.difficulty,
-            timeLimit: question.timeLimit,
-            order: question.order ?? index + 1,
+          create: questions.map((q: any, index: number) => ({
+            text: q.text,
+            options: q.options,
+            correctAnswer: Number(q.correctAnswer),
+            explanation: q.explanation ?? "",
+            difficulty: q.difficulty ?? difficulty,
+            timeLimit: Number(q.timeLimit ?? 30),
+            order: q.order ?? index + 1,
           })),
         },
       },
       include: {
         quizQuestions: true,
       },
-    });
+    })
 
-    return NextResponse.json(
-      {
-        data: {
-          ...quiz,
-          questions: quiz.quizQuestions,
-        },
-        error: null,
-        status: 201,
+    return NextResponse.json({
+      data: {
+        quizId: quiz.id,
+        questions: quiz.quizQuestions.map(q => ({
+          id: q.id,
+          quizId: q.quizId,
+          text: q.text,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          explanation: q.explanation,
+          difficulty: q.difficulty,
+          timeLimit: q.timeLimit,
+          order: q.order,
+        })),
       },
-      { status: 201 },
-    );
-  } catch (error: unknown) {
-    return NextResponse.json(
-      {
-        data: null,
-        error: error instanceof Error ? error.message : "Unable to create quiz.",
-        status: 500,
-      },
-      { status: 500 },
-    );
+    })
+  } catch (error) {
+    console.error("Create quiz error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

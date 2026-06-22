@@ -35,57 +35,62 @@ export default function CreateQuizPage() {
 
   const quizPreviewLabel = useMemo(() => `${topic} • ${difficulty.toLowerCase()} • ${mode.toLowerCase()}`, [topic, difficulty, mode]);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError(null);
-    setIsLoading(true);
-
-    const newId = `${topic.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`;
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+    setError(null)
+    setIsLoading(true)
 
     try {
-      const response = await fetch("/api/ai/generate-questions", {
+      // Step 1: Generate questions from Gemini
+      const aiResponse = await fetch("/api/ai/generate-questions", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic, difficulty, count: questionCount }),
-      });
-
-      const payload = await response.json();
-      if (!response.ok || !payload?.data?.questions) {
-        throw new Error(payload?.error || "Unable to generate questions.");
+      })
+      const aiPayload = await aiResponse.json()
+      if (!aiResponse.ok || !aiPayload?.data?.questions) {
+        throw new Error(aiPayload?.error || "Unable to generate questions.")
       }
 
-      const questions = payload.data.questions.map((question: any, index: number) => ({
-        id: `${newId}-q-${index}`,
-        quizId: newId,
-        text: question.text ?? `Question ${index + 1}`,
-        options: Array.isArray(question.options) ? question.options : [],
-        correctAnswer: Number(question.correctAnswer ?? 0),
-        explanation: question.explanation ?? "",
-        difficulty: question.difficulty ?? difficulty,
-        timeLimit: Number(question.timeLimit ?? 30),
-        order: question.order ?? index + 1,
-      }));
+      // Step 2: Save quiz + questions to DB → get real DB ids
+      const saveResponse = await fetch("/api/quiz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: `${topic} practice quiz`,
+          topic,
+          difficulty,
+          mode,
+          questions: aiPayload.data.questions,
+        }),
+      })
+      const savePayload = await saveResponse.json()
+      if (!saveResponse.ok || !savePayload?.data?.quizId) {
+        throw new Error(savePayload?.error || "Unable to save quiz.")
+      }
 
+      const realDbId = savePayload.data.quizId
+      const realQuestions = savePayload.data.questions
+
+      // Step 3: Start quiz with real DB id
       useQuizStore.getState().startQuiz(
-        newId,
+        realDbId,
         `${topic} practice quiz`,
         topic,
-        questions,
+        realQuestions,
         mode,
         difficulty,
         120,
-      );
+      )
 
-      setCreatedQuizId(newId);
-      router.push(`/quiz/${newId}`);
+      setCreatedQuizId(realDbId)
+      router.push(`/quiz/${realDbId}`)
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Unknown error generating the quiz.");
+      setError(error instanceof Error ? error.message : "Unknown error.")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">

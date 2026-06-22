@@ -128,9 +128,8 @@ export default function QuizPage() {
     }
   };
 
-  const handleFinish = () => {
-    finishQuiz();
-    router.push(`/quiz/${currentQuizId ?? mockQuiz.id}/results`);
+  const handleFinish = async () => {
+    await finishQuiz(router);
   };
 
   return (

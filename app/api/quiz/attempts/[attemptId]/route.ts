@@ -5,11 +5,12 @@ import { syncClerkUser } from "../../../../../src/lib/user-sync"
 
 export async function GET(
   request: Request,
-  { params }: { params: { attemptId: string } }
+   { params }: { params: Promise<{ attemptId: string }> } 
 ) {
   try {
     // Auth check
     const { userId } = await auth()
+     const { attemptId } = await params
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
@@ -22,7 +23,7 @@ export async function GET(
 
     // Fetch quiz attempt with all related data
     const attempt = await prisma.quizAttempt.findUnique({
-      where: { id: params.attemptId },
+      where: { id: attemptId },
       include: {
         userAnswers: { include: { question: true } },
         quiz: true,
