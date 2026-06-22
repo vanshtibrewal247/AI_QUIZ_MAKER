@@ -1,97 +1,119 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles, BarChart3, BrainCircuit } from "lucide-react";
+import { Upload, Zap, PlayCircle } from "lucide-react";
 
-const features = [
+const processingSteps = [
   {
-    title: "AI-powered quizzes",
-    description: "Generate custom quizzes from any topic in seconds with intelligent question selection.",
+    number: 1,
+    title: "Input Content",
+    description: "Upload PDFs, paste text, or provide URLs. The system ingests your raw knowledge base securely.",
+    icon: Upload,
   },
   {
-    title: "Adaptive difficulty",
-    description: "Automatically adjust challenge level based on learner performance and progress.",
+    number: 2,
+    title: "AI Processing",
+    description: "Our neural engine analyzes the content, extracts key concepts, and formulates challenging questions.",
+    icon: Zap,
   },
   {
-    title: "Performance insights",
-    description: "Track strengths, weaknesses, and improvement areas with easy-to-read analytics.",
+    number: 3,
+    title: "Start Quiz",
+    description: "Engage with adaptive quizzes. Receive instant, intelligent feedback to solidify your understanding.",
+    icon: PlayCircle,
   },
 ];
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <main className="mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-12 lg:px-8">
-        <section className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-          <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/80 px-4 py-2 text-sm text-slate-300">
-              <Sparkles className="h-4 w-4 text-indigo-400" />
-              Launch your next quiz in minutes
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-amber-50 to-orange-50">
+      <main className="flex flex-col">
+        {/* Hero Section */}
+        <section className="flex min-h-[80vh] flex-col items-center justify-center px-6 py-20 lg:px-8">
+          <div className="text-center space-y-8 max-w-4xl">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-white/50 px-4 py-2 text-sm font-medium text-amber-900 backdrop-blur">
+              Cognition Refined
             </div>
-            <div className="space-y-6">
-              <h1 className="max-w-2xl text-5xl font-semibold tracking-tight text-white sm:text-6xl">
-                Build smarter quizzes with AI-driven insights.
+
+            {/* Headline */}
+            <div className="space-y-4">
+              <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
+                <span className="text-amber-900">Knowledge,</span>
+                <br />
+                <span className="bg-gradient-to-r from-amber-700 via-yellow-600 to-amber-800 bg-clip-text text-transparent">
+                  Supercharged by AI
+                </span>
               </h1>
-              <p className="max-w-2xl text-lg leading-8 text-slate-300">
-                Create, practice, and improve with adaptive quizzes designed for focused learning. Perfect for students, teachers, and lifelong learners.
+              <p className="text-lg md:text-xl text-amber-900/70 max-w-2xl mx-auto leading-relaxed">
+                Instantly transform any content—text, PDFs, or URLs—into interactive, adaptive quizzes. Accelerate learning with cognitive processing at the speed of thought.
               </p>
             </div>
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center justify-center rounded-full bg-indigo-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400"
-              >
-                Go to dashboard
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Link
                 href="/quiz/create"
-                className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-slate-900/80 px-6 py-3 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-800"
+                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-700 to-amber-800 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl hover:from-amber-800 hover:to-amber-900 transition-all"
               >
-                Create a quiz
+                Create Your First Quiz
+              </Link>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center justify-center rounded-full border-2 border-amber-700 text-amber-900 px-8 py-3 font-semibold hover:bg-white/30 transition-all"
+              >
+                View Demo
               </Link>
             </div>
-          </div>
 
-          <div className="rounded-[2rem] border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-slate-950/20">
-            <div className="rounded-3xl border border-slate-800 bg-slate-950 p-6">
-              <div className="mb-5 flex items-center justify-between text-slate-400">
-                <span className="text-sm">Live practice session</span>
-                <span className="rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-300">Active</span>
-              </div>
-              <div className="space-y-4">
-                <div className="rounded-3xl bg-slate-900 p-5 shadow-inner shadow-slate-950/30">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-sm text-slate-400">Current quiz</p>
-                      <p className="mt-1 text-lg font-semibold text-white">Algebra mastery</p>
+            {/* Trust Statement */}
+            <p className="text-sm text-amber-800/60 pt-4">
+              Trusted by 50,000+ Learners & Visionaries
+            </p>
+          </div>
+        </section>
+
+        {/* Cognitive Processing Pipeline */}
+        <section className="px-6 py-20 lg:px-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16 space-y-2">
+              <h2 className="text-4xl font-bold text-amber-900">
+                Cognitive Processing Pipeline
+              </h2>
+              <p className="text-amber-900/60">
+                From raw data to active recall in three seamless steps
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {processingSteps.map((step) => {
+                const Icon = step.icon;
+                return (
+                  <div
+                    key={step.number}
+                    className="flex flex-col items-start p-8 rounded-2xl bg-white/60 border border-white shadow-lg hover:shadow-xl hover:bg-white/80 transition-all backdrop-blur-sm"
+                  >
+                    <div className="flex items-center justify-center h-14 w-14 rounded-lg bg-gradient-to-br from-amber-700/20 to-yellow-600/20 mb-6">
+                      <Icon className="h-7 w-7 text-amber-700" />
                     </div>
-                    <div className="rounded-2xl bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-300">Medium</div>
+                    <div className="space-y-3">
+                      <h3 className="text-2xl font-bold text-amber-900">
+                        {step.number}. {step.title}
+                      </h3>
+                      <p className="text-amber-900/70 leading-relaxed">
+                        {step.description}
+                      </p>
+                    </div>
                   </div>
-                  <div className="mt-6 grid grid-cols-2 gap-4 text-sm text-slate-300">
-                    <div className="rounded-3xl bg-slate-950/80 p-4">
-                      <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Score</p>
-                      <p className="mt-2 text-2xl font-semibold text-white">88%</p>
-                    </div>
-                    <div className="rounded-3xl bg-slate-950/80 p-4">
-                      <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Time left</p>
-                      <p className="mt-2 text-2xl font-semibold text-white">12m 30s</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        <section className="mt-16 grid gap-6 lg:grid-cols-3">
-          {features.map((feature) => (
-            <article key={feature.title} className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 p-8 shadow-xl shadow-slate-950/20">
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-300">
-                {feature.title.includes("AI") ? <BrainCircuit className="h-6 w-6" /> : feature.title.includes("difficulty") ? <BarChart3 className="h-6 w-6" /> : <Sparkles className="h-6 w-6" />}
-              </div>
-              <h2 className="text-xl font-semibold text-white">{feature.title}</h2>
-              <p className="mt-3 text-sm leading-7 text-slate-400">{feature.description}</p>
-            </article>
-          ))}
+        {/* Footer CTA */}
+        <section className="px-6 py-16 lg:px-8 text-center">
+          <p className="text-sm text-amber-800/60">
+            © 2024 QuizMind AI. Cognition Expanded.
+          </p>
         </section>
       </main>
     </div>
