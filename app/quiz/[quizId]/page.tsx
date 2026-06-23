@@ -66,8 +66,10 @@ export default function QuizPage() {
   const [isFetchingExplanation, setIsFetchingExplanation] = useState(false);
   const [explanationError, setExplanationError] = useState<string | null>(null);
   const [isShowingAiExplanation, setIsShowingAiExplanation] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFinish = useCallback(async () => {
+    setIsSubmitting(true);
     await finishQuiz(router);
   }, [finishQuiz, router]);
 
@@ -154,6 +156,20 @@ export default function QuizPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar />
+      
+      {/* Loading overlay when submitting */}
+      {isSubmitting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="rounded-3xl bg-white p-12 shadow-2xl">
+            <div className="flex flex-col items-center gap-4">
+              <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-300 border-t-indigo-600"></div>
+              <h2 className="text-xl font-semibold text-slate-900">Processing Results...</h2>
+              <p className="text-sm text-slate-600">Your quiz submission is being processed.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mx-auto flex max-w-7xl gap-6 px-4 py-6 lg:px-8">
         <Sidebar />
 

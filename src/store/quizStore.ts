@@ -4,6 +4,7 @@ import { Difficulty, QuizMode, Question, UserAnswer } from "../types/quiz";
 
 export type TimerState = {
   remainingSeconds: number;
+  initialTimeLimit: number;
   startedAt?: number;
   isActive: boolean;
   totalElapsed?: number;
@@ -38,6 +39,7 @@ export type QuizStoreState = {
 
 const defaultTimerState: TimerState = {
   remainingSeconds: 0,
+  initialTimeLimit: 0,
   isActive: false,
 };
 
@@ -69,6 +71,7 @@ export const useQuizStore = create<QuizStoreState>()(
           userAnswers: [],
           timerState: {
             remainingSeconds: initialTimeLimit,
+            initialTimeLimit,
             startedAt: Date.now(),
             isActive: true,
             totalElapsed: 0,
@@ -134,10 +137,8 @@ export const useQuizStore = create<QuizStoreState>()(
         try {
           set({ isLoading: true });
 
-          // Calculate total time taken
-          const totalTimeTaken = state.timerState.startedAt
-            ? Math.floor((Date.now() - state.timerState.startedAt) / 1000)
-            : state.timerState.totalElapsed ?? 0;
+          // Calculate total time taken (initial time limit - remaining seconds)
+          const totalTimeTaken = state.timerState.initialTimeLimit - state.timerState.remainingSeconds;
 
           // Prepare answers payload
           const answers = state.userAnswers.map((a) => ({
