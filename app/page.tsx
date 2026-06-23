@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Upload, Zap, PlayCircle } from "lucide-react";
-import Galaxy from "@/components/background/Galaxy";
+
 
 const processingSteps = [
   {
