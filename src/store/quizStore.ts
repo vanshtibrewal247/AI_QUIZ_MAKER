@@ -30,6 +30,7 @@ export type QuizStoreState = {
   answerQuestion: (questionId: string, selectedAnswer: number, isCorrect: boolean, timeSpent: number) => void;
   nextQuestion: () => void;
   previousQuestion: () => void;
+  decrementTimer: () => void;
   finishQuiz: (router: any) => Promise<void>;
   fetchExplanation: (questionId: string, explanation: string) => void;
   adjustDifficulty: (newDifficulty: Difficulty) => void;
@@ -109,6 +110,18 @@ export const useQuizStore = create<QuizStoreState>()(
         const { currentQuestionIndex } = get();
         if (currentQuestionIndex > 0) {
           set({ currentQuestionIndex: currentQuestionIndex - 1 });
+        }
+      },
+
+      decrementTimer: () => {
+        const { timerState } = get();
+        if (timerState.isActive && timerState.remainingSeconds > 0) {
+          set({
+            timerState: {
+              ...timerState,
+              remainingSeconds: Math.max(0, timerState.remainingSeconds - 1),
+            },
+          });
         }
       },
 

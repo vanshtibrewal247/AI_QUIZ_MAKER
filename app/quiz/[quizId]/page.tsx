@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useQuizStore } from "@/store/quizStore";
 import { Navbar } from "@/components/layout/Navbar";
@@ -57,6 +57,7 @@ export default function QuizPage() {
     nextQuestion,
     previousQuestion,
     answerQuestion,
+    decrementTimer,
     finishQuiz,
     explanations,
     fetchExplanation,
@@ -65,6 +66,10 @@ export default function QuizPage() {
   const [isFetchingExplanation, setIsFetchingExplanation] = useState(false);
   const [explanationError, setExplanationError] = useState<string | null>(null);
   const [isShowingAiExplanation, setIsShowingAiExplanation] = useState(false);
+
+  const handleFinish = useCallback(async () => {
+    await finishQuiz(router);
+  }, [finishQuiz, router]);
 
   useEffect(() => {
     if (!currentQuizId) {
@@ -79,6 +84,24 @@ export default function QuizPage() {
       );
     }
   }, [currentQuizId]);
+
+  // Timer countdown effect
+  useEffect(() => {
+    if (!timerState.isActive) return;
+
+    const interval = setInterval(() => {
+      decrementTimer();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timerState.isActive, decrementTimer]);
+
+  // Auto-finish quiz when timer reaches 0
+  useEffect(() => {
+    if (timerState.remainingSeconds === 0 && timerState.isActive) {
+      handleFinish();
+    }
+  }, [timerState.remainingSeconds, timerState.isActive]);
 
   const activeQuestions = currentQuestions.length ? currentQuestions : mockQuiz.questions;
   const question = activeQuestions[currentQuestionIndex] ?? activeQuestions[0];
@@ -126,10 +149,6 @@ export default function QuizPage() {
     } finally {
       setIsFetchingExplanation(false);
     }
-  };
-
-  const handleFinish = async () => {
-    await finishQuiz(router);
   };
 
   return (
