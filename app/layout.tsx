@@ -29,7 +29,16 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <ClerkProvider>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        
+        <div className="bg"></div>
+
+<div className="star-field">
+<div className="layer"></div>
+<div className="layer"></div>
+<div className="layer"></div>
+</div>
+        {children}</body>
       </ClerkProvider>
     </html>
   );
