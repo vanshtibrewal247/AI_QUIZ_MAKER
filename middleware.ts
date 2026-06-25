@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/quiz(.*)"]);
 const isPublicRoute = createRouteMatcher(["/login(.*)"]);
-
+export const runtime = "nodejs";
 export default clerkMiddleware(async (auth, req) => {
   if (isPublicRoute(req)) {
     return NextResponse.next();
